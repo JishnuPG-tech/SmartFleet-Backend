@@ -1,0 +1,33 @@
+from datetime import datetime
+from typing import Optional
+from pydantic import BaseModel, Field, ConfigDict
+
+class LoginRequest(BaseModel):
+    phone: str = Field(..., description="E.164 phone number, e.g. +91 98950 00000 or 9895000000")
+    password: str = Field(..., description="Admin PIN or password")
+
+class TokenResponse(BaseModel):
+    access_token: str
+    token_type: str = "bearer"
+    role: str
+    user_id: str
+    phone: str
+    full_name: str
+
+class DriverOtpRequest(BaseModel):
+    phone: str = Field(..., description="Driver phone number to send 4-digit SMS OTP")
+
+class DriverOtpVerify(BaseModel):
+    phone: str
+    otp: str = Field(..., min_length=4, max_length=6, description="4 or 6-digit OTP code")
+
+class UserProfile(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: str
+    phone: str
+    full_name: str
+    role: str
+    avatar_url: Optional[str] = None
+    is_active: bool = True
+    assigned_truck_plate: Optional[str] = None
