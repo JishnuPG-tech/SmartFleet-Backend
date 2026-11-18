@@ -28,10 +28,10 @@ DEFAULT_UPDATE_DATA: Dict[str, Any] = {
     "apk_size_bytes": 181400000,
     "checksum_sha256": None,
     "release_notes": [
-        "⚡ 1-Tap In-App Auto-Updater: Self-hosted enterprise updates without app store delays",
-        "🎨 Fixed text clipping on metrics, driver registration, and quick action cards",
-        "🚚 Empty states added for Trips, Trucks, and Drivers with direct add actions",
-        "🔒 Enterprise 256-Bit SSL encryption certified with Kerala NH-66 logistics support"
+        "Driver lifecycle state management: Standby, Active, and Breakdown SOS",
+        "NH-66 real-time GPS telemetry tracking and route monitoring",
+        "Offline-first waybill caching with instant cloud synchronization",
+        "Verified SHA-256 binary package delivery via in-app channel"
     ],
     "is_mandatory": False,
     "published_at": "2026-11-18T10:00:00Z"
