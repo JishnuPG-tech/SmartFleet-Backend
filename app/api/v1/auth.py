@@ -2,6 +2,7 @@ import os
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
+from app.core.config import settings
 from app.core.database import get_db
 from app.core.security import verify_password, get_password_hash, create_access_token
 from app.models.user import User
@@ -26,8 +27,8 @@ router = APIRouter(prefix="/auth", tags=["Authentication & Session"])
 
 @router.post("/admin-login", response_model=TokenResponse)
 async def admin_login(req: AdminLoginRequest, db: AsyncSession = Depends(get_db)):
-    expected_username = os.environ.get("ADMIN_USERNAME", "admin").strip()
-    expected_password = os.environ.get("ADMIN_PASSWORD", "SmartFleet@2026").strip()
+    expected_username = os.environ.get("ADMIN_USERNAME", getattr(settings, "ADMIN_USERNAME", "Jishnu")).strip()
+    expected_password = os.environ.get("ADMIN_PASSWORD", getattr(settings, "ADMIN_PASSWORD", "Jishnu2005")).strip()
 
     req_user = req.username.strip()
     req_pass = req.password.strip()
