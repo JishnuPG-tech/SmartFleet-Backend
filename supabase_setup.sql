@@ -1,6 +1,21 @@
+# SmartFleet 2.0 — Supabase PostgreSQL & PostGIS Database Setup
+
+This script sets up the complete production database schema on **Supabase** for SmartFleet 2.0.
+
+> [!NOTE]
+> **How to execute:**
+> 1. Open your Supabase Dashboard: [https://supabase.com/dashboard/project/pnfleqdwvbnerpjwqoqe](https://supabase.com/dashboard/project/pnfleqdwvbnerpjwqoqe)
+> 2. Navigate to **SQL Editor** in the left sidebar.
+> 3. Click **New Query**, paste the SQL script below, and click **Run**.
+
+---
+
+### Production SQL Migration Script
+
+```sql
 -- =============================================================================
 -- SMARTFLEET 2.0 - PRODUCTION DATABASE SCHEMA FOR SUPABASE (POSTGRESQL + POSTGIS)
--- Architecture: Multi-tenant Fleet Tracking, POD, Realtime Telemetry, Geofencing
+-- Multi-tenant Fleet Tracking, POD, Realtime Telemetry, Geofencing
 -- Compatible with: Supabase PostgreSQL 15+, Supabase Auth / Custom JWT, RLS
 -- =============================================================================
 
@@ -9,8 +24,8 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 CREATE EXTENSION IF NOT EXISTS "pgcrypto";
 CREATE EXTENSION IF NOT EXISTS "postgis";
 
--- 2. ENUM TYPES (Optional drop and create safe)
-DO 21164 BEGIN
+-- 2. ENUM TYPES
+DO $$ BEGIN
     IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'user_role') THEN
         CREATE TYPE user_role AS ENUM ('admin', 'driver', 'dispatcher');
     END IF;
@@ -23,7 +38,7 @@ DO 21164 BEGIN
     IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'alert_severity') THEN
         CREATE TYPE alert_severity AS ENUM ('info', 'warning', 'critical');
     END IF;
-END 21164;
+END $$;
 
 -- 3. USERS TABLE
 CREATE TABLE IF NOT EXISTS public.users (
@@ -158,29 +173,48 @@ ALTER TABLE public.telemetry_logs ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.operational_alerts ENABLE ROW LEVEL SECURITY;
 
 -- Allow Service Role and authenticated backend full access
-CREATE POLICY IF NOT EXISTS "Service role full access on users" ON public.users FOR ALL USING (true);
-CREATE POLICY IF NOT EXISTS "Service role full access on drivers" ON public.drivers FOR ALL USING (true);
-CREATE POLICY IF NOT EXISTS "Service role full access on trucks" ON public.trucks FOR ALL USING (true);
-CREATE POLICY IF NOT EXISTS "Service role full access on trips" ON public.trips FOR ALL USING (true);
-CREATE POLICY IF NOT EXISTS "Service role full access on pod" ON public.proof_of_delivery FOR ALL USING (true);
-CREATE POLICY IF NOT EXISTS "Service role full access on telemetry" ON public.telemetry_logs FOR ALL USING (true);
-CREATE POLICY IF NOT EXISTS "Service role full access on alerts" ON public.operational_alerts FOR ALL USING (true);
+DROP POLICY IF EXISTS "Service role full access on users" ON public.users;
+CREATE POLICY "Service role full access on users" ON public.users FOR ALL USING (true);
+
+DROP POLICY IF EXISTS "Service role full access on drivers" ON public.drivers;
+CREATE POLICY "Service role full access on drivers" ON public.drivers FOR ALL USING (true);
+
+DROP POLICY IF EXISTS "Service role full access on trucks" ON public.trucks;
+CREATE POLICY "Service role full access on trucks" ON public.trucks FOR ALL USING (true);
+
+DROP POLICY IF EXISTS "Service role full access on trips" ON public.trips;
+CREATE POLICY "Service role full access on trips" ON public.trips FOR ALL USING (true);
+
+DROP POLICY IF EXISTS "Service role full access on pod" ON public.proof_of_delivery;
+CREATE POLICY "Service role full access on pod" ON public.proof_of_delivery FOR ALL USING (true);
+
+DROP POLICY IF EXISTS "Service role full access on telemetry" ON public.telemetry_logs;
+CREATE POLICY "Service role full access on telemetry" ON public.telemetry_logs FOR ALL USING (true);
+
+DROP POLICY IF EXISTS "Service role full access on alerts" ON public.operational_alerts;
+CREATE POLICY "Service role full access on alerts" ON public.operational_alerts FOR ALL USING (true);
 
 -- =============================================================================
 -- SUPABASE REALTIME REPLICATION
 -- Enable real-time WebSocket events for fleet monitoring
 -- =============================================================================
-ALTER PUBLICATION supabase_realtime ADD TABLE public.trips, public.trucks, public.operational_alerts, public.telemetry_logs;
+DO $$ BEGIN
+    BEGIN
+        ALTER PUBLICATION supabase_realtime ADD TABLE public.trips, public.trucks, public.operational_alerts, public.telemetry_logs;
+    EXCEPTION WHEN duplicate_object THEN
+        NULL;
+    END;
+END $$;
 
 -- =============================================================================
 -- SEED DATA (KERALA FLEET ECOSYSTEM)
 -- =============================================================================
 -- 1. Admin & Drivers
 INSERT INTO public.users (id, phone, full_name, role, hashed_password) VALUES
-('2a500149-3124-4529-9221-32ddf5dfd299', '+91 98950 00000', 'Fleet Manager (Kochi HQ)', 'admin', 'b2'),
-('3b600250-4235-5630-a332-43eef6efd3aa', '+91 94471 23456', 'Muhammed Shafi', 'driver', 'b2'),
-('4c700361-5346-6741-b443-54ffa7fea4bb', '+91 98462 34567', 'Suresh Kumar', 'driver', 'b2'),
-('5d800472-6457-7852-c554-6500b80fb5cc', '+91 97453 45678', 'Rajesh Pillai', 'driver', 'b2')
+('2a500149-3124-4529-9221-32ddf5dfd299', '+91 98950 00000', 'Fleet Manager (Kochi HQ)', 'admin', '$2b$12$e0X76r5P3M1v87s3Mv3aEOyXw3zP2K8Qx3x3x3x3x3x3x3x3x3x3x'),
+('3b600250-4235-5630-a332-43eef6efd3aa', '+91 94471 23456', 'Muhammed Shafi', 'driver', '$2b$12$e0X76r5P3M1v87s3Mv3aEOyXw3zP2K8Qx3x3x3x3x3x3x3x3x3x3x'),
+('4c700361-5346-6741-b443-54ffa7fea4bb', '+91 98462 34567', 'Suresh Kumar', 'driver', '$2b$12$e0X76r5P3M1v87s3Mv3aEOyXw3zP2K8Qx3x3x3x3x3x3x3x3x3x3x'),
+('5d800472-6457-7852-c554-6500b80fb5cc', '+91 97453 45678', 'Rajesh Pillai', 'driver', '$2b$12$e0X76r5P3M1v87s3Mv3aEOyXw3zP2K8Qx3x3x3x3x3x3x3x3x3x3x')
 ON CONFLICT (phone) DO NOTHING;
 
 INSERT INTO public.drivers (id, license_number, experience_years, current_truck_plate, status, total_trips_completed) VALUES
@@ -209,3 +243,4 @@ INSERT INTO public.operational_alerts (id, truck_plate, trip_id, severity, title
 ('a1111111-1111-1111-1111-111111111111', 'KL 07 CD 4589', 'TRIP-9821', 'warning', 'NH 66 Edappally Bypass Congestion', 'Heavy transit delay detected near Vyttila mobility corridor (+25 mins ETA impact)', false),
 ('a2222222-2222-2222-2222-222222222222', 'KL 08 AP 3412', NULL, 'critical', 'Scheduled Brake Liners Replacement', 'Brake pad sensor flagged maintenance threshold reached at Kalamassery workshop', false)
 ON CONFLICT (id) DO NOTHING;
+```
