@@ -269,13 +269,24 @@ async def login(req: LoginRequest, db: AsyncSession = Depends(get_db)):
         phone=user.phone,
         full_name=user.full_name
     )
+    lic = None
+    plate = None
+    if user.role == "driver":
+        d_res = await db.execute(select(Driver).filter(Driver.id == user.id))
+        driver = d_res.scalars().first()
+        if driver:
+            lic = driver.license_number
+            plate = driver.current_truck_plate
+
     return TokenResponse(
         access_token=token,
         token_type="bearer",
         role=user.role,
         user_id=user.id,
         phone=user.phone,
-        full_name=user.full_name
+        full_name=user.full_name,
+        license_number=lic,
+        assigned_truck_plate=plate
     )
 
 @router.post("/driver-otp-request")
