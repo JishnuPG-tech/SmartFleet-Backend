@@ -1466,3 +1466,44 @@ INFO:     Waiting for application startup.
 INFO:     Application startup complete.
 INFO:     10.16.37.163:0 - "GET /uploads/apks/SmartFleet-latest.apk HTTP/1.1" 200 OK
 INFO:     127.0.0.1:52528 - "GET /api/v1/app/check-update?current_version_code=1 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:41770 - "GET /api/v1/health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:58864 - "GET /docs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58880 - "GET /api/v1/app/check-update HTTP/1.1" 200 OK
+INFO:     127.0.0.1:41484 - "POST /api/v1/auth/login HTTP/1.1" 200 OK
+INFO:     127.0.0.1:47414 - "POST /api/v1/auth/login HTTP/1.1" 200 OK
+INFO:     127.0.0.1:47418 - "POST /api/v1/auth/login HTTP/1.1" 200 OK
+INFO:     127.0.0.1:47432 - "POST /api/v1/auth/login HTTP/1.1" 200 OK
+INFO:     127.0.0.1:47440 - "POST /api/v1/auth/login HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37810 - "POST /api/v1/auth/login HTTP/1.1" 200 OK
+WARNING:  WatchFiles detected changes in 'app/api/v1/auth.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [10408]
+INFO:     Started server process [11843]
+INFO:     Waiting for application startup.
+🚀 Initializing database schema...
+ℹ️ Database already contains data. Skipping initial seeding.
+INFO:     Application startup complete.
+INFO:     10.16.39.107:0 - "GET /api/v1/trips HTTP/1.1" 200 OK
+INFO:     10.16.37.163:0 - "GET /api/v1/trips HTTP/1.1" 200 OK
+INFO:     10.16.25.27:0 - "GET /api/v1/trucks HTTP/1.1" 200 OK
+INFO:     10.16.39.107:0 - "GET /api/v1/trucks HTTP/1.1" 200 OK
+INFO:     10.16.25.27:0 - "GET /api/v1/drivers HTTP/1.1" 200 OK
+INFO:     10.16.26.69:0 - "GET /api/v1/drivers HTTP/1.1" 200 OK
+INFO:     10.16.21.39:0 - "POST /api/v1/auth/driver-login HTTP/1.1" 401 Unauthorized
+INFO:     10.16.25.27:0 - "GET /api/v1/app/check-update?current_version_code=1&current_version_name=2.0.0 HTTP/1.1" 200 OK
+INFO:     10.16.25.27:0 - "GET /uploads/apks/SmartFleet-latest.apk HTTP/1.1" 200 OK
+INFO:     10.16.37.163:0 - "GET /api/v1/trips HTTP/1.1" 200 OK
+INFO:     10.16.25.27:0 - "GET /api/v1/trips HTTP/1.1" 200 OK
+INFO:     10.16.21.39:0 - "GET /api/v1/trucks HTTP/1.1" 200 OK
+INFO:     10.16.1.43:0 - "GET /api/v1/trucks HTTP/1.1" 200 OK
+INFO:     10.16.8.148:0 - "GET /api/v1/drivers HTTP/1.1" 200 OK
+INFO:     10.16.37.163:0 - "GET /api/v1/drivers HTTP/1.1" 200 OK
+INFO:     10.16.25.27:0 - "POST /api/v1/auth/driver-login HTTP/1.1" 401 Unauthorized
+INFO:     10.16.26.69:0 - "GET /api/v1/app/check-update?current_version_code=1&current_version_name=2.0.0 HTTP/1.1" 200 OK
+INFO:     10.16.25.27:0 - "POST /api/v1/auth/admin-login HTTP/1.1" 200 OK
+INFO:     10.16.39.107:0 - "GET /api/v1/app/check-update?current_version_code=1&current_version_name=2.0.0 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:43806 - "GET /api/v1/drivers HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54010 - "GET /api/v1/drivers HTTP/1.1" 200 OK
+INFO:     10.16.37.163:0 - "GET /uploads/apks/SmartFleet-latest.apk HTTP/1.1" 200 OK
