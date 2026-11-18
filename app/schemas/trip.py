@@ -9,8 +9,17 @@ class TripStatusEnum(str, Enum):
     accepted = "accepted"
     running = "running"
     at_destination = "at_destination"
+    breakdown = "breakdown"
     delivered = "delivered"
+    failed = "failed"
     cancelled = "cancelled"
+
+
+class TripBreakdownRequest(BaseModel):
+    latitude: float = Field(..., description="GPS Latitude where breakdown occurred")
+    longitude: float = Field(..., description="GPS Longitude where breakdown occurred")
+    reason: str = Field(..., description="Reason e.g. Engine Overheating, Tyre Puncture, Accident")
+    remarks: Optional[str] = None
 
 class TripCreate(BaseModel):
     origin_city: str = Field(..., description="Origin Kerala city/hub, e.g. Kochi Port")

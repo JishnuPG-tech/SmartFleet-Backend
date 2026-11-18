@@ -10,7 +10,8 @@ from app.models.trip import Trip
 from app.models.truck import Truck
 from app.models.driver import Driver
 from app.models.user import User
-from app.schemas.trip import TripCreate, TripUpdateStatus, TripOut
+from app.models.alert import OperationalAlert
+from app.schemas.trip import TripCreate, TripUpdateStatus, TripOut, TripBreakdownRequest
 from app.services.auth_service import get_current_user
 from app.services.websocket_manager import manager
 
@@ -18,12 +19,15 @@ router = APIRouter(prefix="/trips", tags=["Trips & Freight Dispatch"])
 
 @router.get("", response_model=List[TripOut])
 async def list_trips(
-    status: Optional[str] = Query(None, description="Filter by trip status (waiting, running, delivered)"),
+    status: Optional[str] = Query(None, description="Filter by trip status (waiting, accepted, running, breakdown, delivered, failed)"),
+    driver_id: Optional[str] = Query(None, description="Filter by assigned driver ID"),
     db: AsyncSession = Depends(get_db)
 ):
     query = select(Trip).options(selectinload(Trip.pod)).order_by(Trip.created_at.desc())
     if status:
         query = query.filter(Trip.status == status.strip().lower())
+    if driver_id:
+        query = query.filter(Trip.driver_id == driver_id.strip())
     result = await db.execute(query)
     return result.scalars().all()
 
@@ -79,7 +83,11 @@ async def create_trip(req: TripCreate, db: AsyncSession = Depends(get_db)):
         "type": "trip_created",
         "trip_id": trip.id,
         "truck_plate": trip.truck_plate,
-        "status": trip.status
+        "driver_id": trip.driver_id,
+        "status": trip.status,
+        "origin": trip.origin_city,
+        "dest": trip.dest_city,
+        "cargo": trip.cargo_title
     })
 
     return trip
@@ -92,16 +100,12 @@ async def get_driver_active_trip(
     query = (
         select(Trip)
         .options(selectinload(Trip.pod))
-        .filter(Trip.driver_id == user.id, Trip.status.in_(["running", "at_destination", "waiting"]))
+        .filter(Trip.driver_id == user.id, Trip.status.in_(["waiting", "accepted", "running", "breakdown"]))
         .order_by(Trip.created_at.desc())
         .limit(1)
     )
     res = await db.execute(query)
     trip = res.scalars().first()
-    if not trip:
-        # If no active trip for user, fallback to first running trip for testing
-        fallback = await db.execute(select(Trip).options(selectinload(Trip.pod)).filter(Trip.status == "running").limit(1))
-        return fallback.scalars().first()
     return trip
 
 @router.get("/{id}", response_model=TripOut)
@@ -110,6 +114,137 @@ async def get_trip(id: str, db: AsyncSession = Depends(get_db)):
     trip = result.scalars().first()
     if not trip:
         raise HTTPException(status_code=404, detail=f"Trip '{id}' not found")
+    return trip
+
+@router.post("/{id}/accept", response_model=TripOut)
+async def accept_trip(id: str, db: AsyncSession = Depends(get_db)):
+    result = await db.execute(select(Trip).options(selectinload(Trip.pod)).filter(Trip.id == id.strip()))
+    trip = result.scalars().first()
+    if not trip:
+        raise HTTPException(status_code=404, detail=f"Trip '{id}' not found")
+
+    trip.status = "accepted"
+    await db.commit()
+    await db.refresh(trip)
+
+    await manager.broadcast_fleet({
+        "type": "trip_accepted",
+        "trip_id": trip.id,
+        "truck_plate": trip.truck_plate,
+        "driver_id": trip.driver_id,
+        "status": "accepted"
+    })
+    return trip
+
+@router.post("/{id}/start", response_model=TripOut)
+async def start_trip(id: str, db: AsyncSession = Depends(get_db)):
+    result = await db.execute(select(Trip).options(selectinload(Trip.pod)).filter(Trip.id == id.strip()))
+    trip = result.scalars().first()
+    if not trip:
+        raise HTTPException(status_code=404, detail=f"Trip '{id}' not found")
+
+    now = datetime.now(timezone.utc)
+    trip.status = "running"
+    if not trip.actual_started_at:
+        trip.actual_started_at = now
+
+    t_res = await db.execute(select(Truck).filter(Truck.plate == trip.truck_plate))
+    truck = t_res.scalars().first()
+    if truck:
+        truck.status = "on_trip"
+
+    await db.commit()
+    await db.refresh(trip)
+
+    await manager.broadcast_fleet({
+        "type": "trip_started",
+        "trip_id": trip.id,
+        "truck_plate": trip.truck_plate,
+        "driver_id": trip.driver_id,
+        "status": "running",
+        "actual_started_at": now.isoformat()
+    })
+    return trip
+
+@router.post("/{id}/breakdown", response_model=TripOut)
+async def report_breakdown(id: str, req: TripBreakdownRequest, db: AsyncSession = Depends(get_db)):
+    result = await db.execute(select(Trip).options(selectinload(Trip.pod)).filter(Trip.id == id.strip()))
+    trip = result.scalars().first()
+    if not trip:
+        raise HTTPException(status_code=404, detail=f"Trip '{id}' not found")
+
+    now = datetime.now(timezone.utc)
+    trip.status = "breakdown"
+
+    # Update truck location and status
+    t_res = await db.execute(select(Truck).filter(Truck.plate == trip.truck_plate))
+    truck = t_res.scalars().first()
+    if truck:
+        truck.status = "breakdown"
+        truck.last_latitude = req.latitude
+        truck.last_longitude = req.longitude
+        truck.last_telemetry_at = now
+
+    # Create high-priority operational alert
+    alert = OperationalAlert(
+        truck_plate=trip.truck_plate,
+        trip_id=trip.id,
+        severity="danger",
+        title=f"🚨 Vehicle Breakdown: {trip.truck_plate}",
+        description=f"Driver reported '{req.reason}' during Trip {trip.id} ({trip.origin_city} ➔ {trip.dest_city}). GPS: {req.latitude:.4f}, {req.longitude:.4f}. {req.remarks or ''}".strip(),
+        created_at=now
+    )
+    db.add(alert)
+    await db.commit()
+    await db.refresh(trip)
+
+    # Broadcast emergency alert
+    await manager.broadcast_fleet({
+        "type": "trip_breakdown",
+        "trip_id": trip.id,
+        "truck_plate": trip.truck_plate,
+        "driver_id": trip.driver_id,
+        "latitude": req.latitude,
+        "longitude": req.longitude,
+        "reason": req.reason,
+        "alert_title": alert.title
+    })
+
+    return trip
+
+@router.post("/{id}/fail", response_model=TripOut)
+async def report_delivery_failed(id: str, remarks: Optional[str] = Query(None), db: AsyncSession = Depends(get_db)):
+    result = await db.execute(select(Trip).options(selectinload(Trip.pod)).filter(Trip.id == id.strip()))
+    trip = result.scalars().first()
+    if not trip:
+        raise HTTPException(status_code=404, detail=f"Trip '{id}' not found")
+
+    now = datetime.now(timezone.utc)
+    trip.status = "failed"
+
+    t_res = await db.execute(select(Truck).filter(Truck.plate == trip.truck_plate))
+    truck = t_res.scalars().first()
+    if truck:
+        truck.status = "available"
+
+    alert = OperationalAlert(
+        truck_plate=trip.truck_plate,
+        trip_id=trip.id,
+        severity="warning",
+        title=f"⚠️ Delivery Incomplete: {trip.id}",
+        description=f"Consignment delivery failed ({trip.origin_city} ➔ {trip.dest_city}). Reason: {remarks or 'Consignee unavailable / rejected'}",
+        created_at=now
+    )
+    db.add(alert)
+    await db.commit()
+    await db.refresh(trip)
+
+    await manager.broadcast_fleet({
+        "type": "trip_failed",
+        "trip_id": trip.id,
+        "truck_plate": trip.truck_plate,
+        "status": "failed"
+    })
     return trip
 
 @router.patch("/{id}/status", response_model=TripOut)
@@ -146,7 +281,6 @@ async def update_trip_status(id: str, req: TripUpdateStatus, db: AsyncSession = 
     await db.commit()
     await db.refresh(trip)
 
-    # Broadcast status change to live subscribers
     packet = {
         "type": "trip_status_changed",
         "trip_id": trip.id,
