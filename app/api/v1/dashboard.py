@@ -576,8 +576,8 @@ HTML_CONTENT = """<!DOCTYPE html>
 </html>
 """
 
-@router.get("/admin", response_class=HTMLResponse)
-@router.get("/admin/dashboard", response_class=HTMLResponse)
+@router.api_route("/admin", methods=["GET", "HEAD"], response_class=HTMLResponse)
+@router.api_route("/admin/dashboard", methods=["GET", "HEAD"], response_class=HTMLResponse)
 async def admin_portal():
     """Pure-User Command Portal for business owners to manage fleet dropdowns, weights, hubs, and notices."""
     return HTMLResponse(content=HTML_CONTENT, status_code=200)
