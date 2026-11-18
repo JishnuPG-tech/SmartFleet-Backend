@@ -9,6 +9,7 @@ from app.api.v1.earnings import router as earnings_router
 from app.api.v1.alerts import router as alerts_router
 from app.api.v1.websocket import router as ws_router
 from app.api.v1.config import router as config_router
+from app.api.v1.updater import router as updater_router
 
 api_v1_router = APIRouter(prefix="/api/v1")
 api_v1_router.include_router(auth_router)
@@ -20,3 +21,5 @@ api_v1_router.include_router(telemetry_router)
 api_v1_router.include_router(earnings_router)
 api_v1_router.include_router(alerts_router)
 api_v1_router.include_router(config_router)
+
+api_v1_router.include_router(updater_router)

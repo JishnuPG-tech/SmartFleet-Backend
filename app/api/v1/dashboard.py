@@ -116,6 +116,9 @@ HTML_CONTENT = """<!DOCTYPE html>
       <button onclick="switchTab('rates')" id="tab-rates" class="tab-btn px-4 py-2.5 rounded-lg text-sm font-semibold border-b-2 border-transparent text-textSecondary hover:text-white transition">
         💰 Allowance & Settings
       </button>
+      <button onclick="switchTab('updates')" id="tab-updates" class="tab-btn px-4 py-2.5 rounded-lg text-sm font-semibold border-b-2 border-transparent text-textSecondary hover:text-white transition">
+        🚀 App Updates & OTA
+      </button>
     </div>
 
     <!-- TAB 1: CARGO CATEGORIES -->
@@ -568,6 +571,81 @@ HTML_CONTENT = """<!DOCTYPE html>
       loadData();
       showToast('Refreshed latest configuration');
     }
+
+    async function loadUpdateInfo() {
+      try {
+        const res = await fetch('/api/v1/app/check-update?current_version_code=0');
+        if (res.ok) {
+          const u = await res.json();
+          document.getElementById('liveVersionName').textContent = 'v' + u.latest_version_name;
+          document.getElementById('liveVersionCode').textContent = u.latest_version_code;
+          document.getElementById('liveMinCode').textContent = u.min_supported_version_code;
+          document.getElementById('liveApkSize').textContent = (u.apk_size_bytes / (1024*1024)).toFixed(1) + ' MB';
+          document.getElementById('livePublishedAt').textContent = new Date(u.published_at).toLocaleString();
+          
+          const badge = document.getElementById('updateMandatoryBadge');
+          if (u.is_mandatory) {
+            badge.textContent = '🚨 Mandatory Lock';
+            badge.className = 'px-2.5 py-1 text-xs font-bold rounded bg-red-500/10 text-red-400 border border-red-500/30';
+          } else {
+            badge.textContent = '✨ Optional Update';
+            badge.className = 'px-2.5 py-1 text-xs font-bold rounded bg-brand/10 text-brand border border-brand/30';
+          }
+
+          const notesList = document.getElementById('liveReleaseNotes');
+          notesList.innerHTML = '';
+          (u.release_notes || []).forEach(n => {
+            const li = document.createElement('li');
+            li.textContent = '• ' + n;
+            notesList.appendChild(li);
+          });
+
+          // Prepopulate form next version
+          document.getElementById('inputVersionCode').value = u.latest_version_code + 1;
+          const parts = u.latest_version_name.split('.');
+          if (parts.length === 3) {
+            document.getElementById('inputVersionName').value = ;
+          }
+        }
+      } catch (err) {
+        console.error('Failed loading update info', err);
+      }
+    }
+
+    async function handlePublishUpdate(e) {
+      e.preventDefault();
+      const btn = document.getElementById('btnPublishSubmit');
+      const originalText = btn.innerHTML;
+      btn.disabled = true;
+      btn.innerHTML = '<span class="animate-spin">⏳</span> Uploading & Publishing...';
+
+      const form = document.getElementById('publishUpdateForm');
+      const formData = new FormData(form);
+
+      try {
+        const res = await fetch('/api/v1/app/publish-update', {
+          method: 'POST',
+          body: formData
+        });
+
+        if (res.ok) {
+          showToast('🚀 Update published successfully to fleet!');
+          loadUpdateInfo();
+          form.reset();
+        } else {
+          const err = await res.json();
+          showToast('❌ Publish failed: ' + (err.detail || 'Error'));
+        }
+      } catch (err) {
+        showToast('❌ Network error publishing update');
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = originalText;
+      }
+    }
+
+    // Call loadUpdateInfo on startup
+    loadUpdateInfo();
 
     // Initialize
     loadData();
