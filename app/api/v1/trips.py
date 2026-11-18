@@ -76,7 +76,8 @@ async def create_trip(req: TripCreate, db: AsyncSession = Depends(get_db)):
         driver.current_truck_plate = req.truck_plate.strip()
 
     await db.commit()
-    await db.refresh(trip)
+    res = await db.execute(select(Trip).options(selectinload(Trip.pod)).filter(Trip.id == trip.id))
+    trip_loaded = res.scalars().first()
 
     # Broadcast new trip dispatch
     await manager.broadcast_fleet({
@@ -90,7 +91,7 @@ async def create_trip(req: TripCreate, db: AsyncSession = Depends(get_db)):
         "cargo": trip.cargo_title
     })
 
-    return trip
+    return trip_loaded
 
 @router.get("/driver/active", response_model=Optional[TripOut])
 async def get_driver_active_trip(
@@ -106,7 +107,7 @@ async def get_driver_active_trip(
     )
     res = await db.execute(query)
     trip = res.scalars().first()
-    return trip
+    return trip_loaded
 
 @router.get("/{id}", response_model=TripOut)
 async def get_trip(id: str, db: AsyncSession = Depends(get_db)):
@@ -114,7 +115,7 @@ async def get_trip(id: str, db: AsyncSession = Depends(get_db)):
     trip = result.scalars().first()
     if not trip:
         raise HTTPException(status_code=404, detail=f"Trip '{id}' not found")
-    return trip
+    return trip_loaded
 
 @router.post("/{id}/accept", response_model=TripOut)
 async def accept_trip(id: str, db: AsyncSession = Depends(get_db)):
@@ -125,7 +126,8 @@ async def accept_trip(id: str, db: AsyncSession = Depends(get_db)):
 
     trip.status = "accepted"
     await db.commit()
-    await db.refresh(trip)
+    res = await db.execute(select(Trip).options(selectinload(Trip.pod)).filter(Trip.id == trip.id))
+    trip_loaded = res.scalars().first()
 
     await manager.broadcast_fleet({
         "type": "trip_accepted",
@@ -134,7 +136,7 @@ async def accept_trip(id: str, db: AsyncSession = Depends(get_db)):
         "driver_id": trip.driver_id,
         "status": "accepted"
     })
-    return trip
+    return trip_loaded
 
 @router.post("/{id}/start", response_model=TripOut)
 async def start_trip(id: str, db: AsyncSession = Depends(get_db)):
@@ -154,7 +156,8 @@ async def start_trip(id: str, db: AsyncSession = Depends(get_db)):
         truck.status = "on_trip"
 
     await db.commit()
-    await db.refresh(trip)
+    res = await db.execute(select(Trip).options(selectinload(Trip.pod)).filter(Trip.id == trip.id))
+    trip_loaded = res.scalars().first()
 
     await manager.broadcast_fleet({
         "type": "trip_started",
@@ -164,7 +167,7 @@ async def start_trip(id: str, db: AsyncSession = Depends(get_db)):
         "status": "running",
         "actual_started_at": now.isoformat()
     })
-    return trip
+    return trip_loaded
 
 @router.post("/{id}/breakdown", response_model=TripOut)
 async def report_breakdown(id: str, req: TripBreakdownRequest, db: AsyncSession = Depends(get_db)):
@@ -196,7 +199,8 @@ async def report_breakdown(id: str, req: TripBreakdownRequest, db: AsyncSession 
     )
     db.add(alert)
     await db.commit()
-    await db.refresh(trip)
+    res = await db.execute(select(Trip).options(selectinload(Trip.pod)).filter(Trip.id == trip.id))
+    trip_loaded = res.scalars().first()
 
     # Broadcast emergency alert
     await manager.broadcast_fleet({
@@ -210,7 +214,7 @@ async def report_breakdown(id: str, req: TripBreakdownRequest, db: AsyncSession 
         "alert_title": alert.title
     })
 
-    return trip
+    return trip_loaded
 
 @router.post("/{id}/fail", response_model=TripOut)
 async def report_delivery_failed(id: str, remarks: Optional[str] = Query(None), db: AsyncSession = Depends(get_db)):
@@ -237,7 +241,8 @@ async def report_delivery_failed(id: str, remarks: Optional[str] = Query(None), 
     )
     db.add(alert)
     await db.commit()
-    await db.refresh(trip)
+    res = await db.execute(select(Trip).options(selectinload(Trip.pod)).filter(Trip.id == trip.id))
+    trip_loaded = res.scalars().first()
 
     await manager.broadcast_fleet({
         "type": "trip_failed",
@@ -245,7 +250,7 @@ async def report_delivery_failed(id: str, remarks: Optional[str] = Query(None), 
         "truck_plate": trip.truck_plate,
         "status": "failed"
     })
-    return trip
+    return trip_loaded
 
 @router.patch("/{id}/status", response_model=TripOut)
 async def update_trip_status(id: str, req: TripUpdateStatus, db: AsyncSession = Depends(get_db)):
@@ -279,7 +284,8 @@ async def update_trip_status(id: str, req: TripUpdateStatus, db: AsyncSession = 
         trip.distance_done_km = min(trip.total_distance_km, req.distance_done_km)
 
     await db.commit()
-    await db.refresh(trip)
+    res = await db.execute(select(Trip).options(selectinload(Trip.pod)).filter(Trip.id == trip.id))
+    trip_loaded = res.scalars().first()
 
     packet = {
         "type": "trip_status_changed",
@@ -291,4 +297,4 @@ async def update_trip_status(id: str, req: TripUpdateStatus, db: AsyncSession = 
     await manager.broadcast_fleet(packet)
     await manager.broadcast_trip(trip.id, packet)
 
-    return trip
+    return trip_loaded

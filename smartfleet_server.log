@@ -1507,3 +1507,298 @@ INFO:     10.16.39.107:0 - "GET /api/v1/app/check-update?current_version_code=1&
 INFO:     127.0.0.1:43806 - "GET /api/v1/drivers HTTP/1.1" 200 OK
 INFO:     127.0.0.1:54010 - "GET /api/v1/drivers HTTP/1.1" 200 OK
 INFO:     10.16.37.163:0 - "GET /uploads/apks/SmartFleet-latest.apk HTTP/1.1" 200 OK
+INFO:     10.16.25.27:0 - "GET /api/v1/trips HTTP/1.1" 200 OK
+INFO:     10.16.37.163:0 - "GET /api/v1/trips HTTP/1.1" 200 OK
+INFO:     10.16.21.39:0 - "GET /api/v1/trucks HTTP/1.1" 200 OK
+INFO:     10.16.2.20:0 - "GET /api/v1/trucks HTTP/1.1" 200 OK
+INFO:     10.16.37.163:0 - "GET /api/v1/drivers HTTP/1.1" 200 OK
+INFO:     10.16.8.148:0 - "GET /api/v1/drivers HTTP/1.1" 200 OK
+INFO:     10.16.37.163:0 - "POST /api/v1/auth/driver-login HTTP/1.1" 401 Unauthorized
+INFO:     10.16.21.39:0 - "GET /api/v1/app/check-update?current_version_code=1&current_version_name=2.0.0 HTTP/1.1" 200 OK
+INFO:     10.16.37.163:0 - "GET /api/v1/trips HTTP/1.1" 200 OK
+INFO:     10.16.2.20:0 - "GET /api/v1/trips HTTP/1.1" 200 OK
+INFO:     10.16.25.27:0 - "GET /api/v1/trucks HTTP/1.1" 200 OK
+INFO:     10.16.21.39:0 - "GET /api/v1/trucks HTTP/1.1" 200 OK
+INFO:     10.16.21.39:0 - "GET /api/v1/drivers HTTP/1.1" 200 OK
+INFO:     10.16.37.163:0 - "GET /api/v1/drivers HTTP/1.1" 200 OK
+INFO:     10.16.21.39:0 - "POST /api/v1/auth/admin-login HTTP/1.1" 200 OK
+INFO:     10.16.2.20:0 - "GET /api/v1/app/check-update?current_version_code=1&current_version_name=2.0.0 HTTP/1.1" 200 OK
+INFO:     10.16.25.27:0 - "GET /api/v1/trips HTTP/1.1" 200 OK
+INFO:     10.16.37.163:0 - "GET /api/v1/trips HTTP/1.1" 200 OK
+INFO:     10.16.39.107:0 - "GET /api/v1/trucks HTTP/1.1" 200 OK
+INFO:     10.16.8.148:0 - "GET /api/v1/trucks HTTP/1.1" 200 OK
+INFO:     10.16.25.27:0 - "GET /api/v1/drivers HTTP/1.1" 200 OK
+INFO:     10.16.2.20:0 - "GET /api/v1/drivers HTTP/1.1" 200 OK
+INFO:     10.16.8.148:0 - "POST /api/v1/auth/admin-login HTTP/1.1" 200 OK
+INFO:     10.16.39.107:0 - "GET /api/v1/app/check-update?current_version_code=3&current_version_name=2.2.0 HTTP/1.1" 200 OK
+INFO:     10.16.8.148:0 - "POST /api/v1/trips HTTP/1.1" 500 Internal Server Error
+ERROR:    Exception in ASGI application
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.11/site-packages/uvicorn/protocols/http/httptools_impl.py", line 422, in run_asgi
+    result = await app(  # type: ignore[func-returns-value]
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/uvicorn/middleware/proxy_headers.py", line 63, in __call__
+    return await self.app(scope, receive, send)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/fastapi/applications.py", line 1194, in __call__
+    await super().__call__(scope, receive, send)
+  File "/usr/local/lib/python3.11/site-packages/starlette/applications.py", line 96, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/usr/local/lib/python3.11/site-packages/starlette/middleware/errors.py", line 186, in __call__
+    raise exc
+  File "/usr/local/lib/python3.11/site-packages/starlette/middleware/errors.py", line 164, in __call__
+    await self.app(scope, receive, _send)
+  File "/usr/local/lib/python3.11/site-packages/fastapi/telemetry/_asgi.py", line 151, in __call__
+    await self.app(scope, receive, send)
+  File "/usr/local/lib/python3.11/site-packages/starlette/middleware/cors.py", line 91, in __call__
+    await self.simple_response(scope, receive, send, request_headers=headers)
+  File "/usr/local/lib/python3.11/site-packages/starlette/middleware/cors.py", line 149, in simple_response
+    await self.app(scope, receive, send)
+  File "/usr/local/lib/python3.11/site-packages/starlette/middleware/exceptions.py", line 63, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+  File "/usr/local/lib/python3.11/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/usr/local/lib/python3.11/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "/usr/local/lib/python3.11/site-packages/fastapi/middleware/asyncexitstack.py", line 18, in __call__
+    await self.app(scope, receive, send)
+  File "/usr/local/lib/python3.11/site-packages/starlette/routing.py", line 683, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/usr/local/lib/python3.11/site-packages/fastapi/routing.py", line 2811, in app
+    await route.handle(scope, receive, send)
+  File "/usr/local/lib/python3.11/site-packages/fastapi/routing.py", line 1839, in handle
+    await self.original_router.handle(scope, receive, send)
+  File "/usr/local/lib/python3.11/site-packages/fastapi/routing.py", line 2894, in handle
+    await included_router._handle_selected(scope, receive, send)
+  File "/usr/local/lib/python3.11/site-packages/fastapi/routing.py", line 1850, in _handle_selected
+    await route.handle(scope, receive, send)
+  File "/usr/local/lib/python3.11/site-packages/fastapi/routing.py", line 1839, in handle
+    await self.original_router.handle(scope, receive, send)
+  File "/usr/local/lib/python3.11/site-packages/fastapi/routing.py", line 2894, in handle
+    await included_router._handle_selected(scope, receive, send)
+  File "/usr/local/lib/python3.11/site-packages/fastapi/routing.py", line 1865, in _handle_selected
+    await original_route.handle(scope, receive, send)
+  File "/usr/local/lib/python3.11/site-packages/fastapi/routing.py", line 1328, in handle
+    await effective_context.app(scope, receive, send)
+  File "/usr/local/lib/python3.11/site-packages/fastapi/routing.py", line 166, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+  File "/usr/local/lib/python3.11/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/usr/local/lib/python3.11/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "/usr/local/lib/python3.11/site-packages/fastapi/routing.py", line 152, in app
+    response = await f(request)
+               ^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/fastapi/routing.py", line 767, in app
+    content = await serialize_response(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/fastapi/routing.py", line 343, in serialize_response
+    raise ResponseValidationError(
+fastapi.exceptions.ResponseValidationError: 1 validation error:
+  {'type': 'get_attribute_error', 'loc': ('response', 'pod'), 'msg': "Error extracting attribute: StatementError: (sqlalchemy.exc.MissingGreenlet) greenlet_spawn has not been called; can't call await_() here. Was IO attempted in an unexpected place?\n[SQL: SELECT proof_of_delivery.id, proof_of_delivery.trip_id, proof_of_delivery.otp_code, proof_of_delivery.otp_verified_at, proof_of_delivery.photo_url, proof_of_delivery.signature_svg, proof_of_delivery.recipient_name, proof_of_delivery.recipient_notes, proof_of_delivery.created_at \nFROM proof_of_delivery \nWHERE ? = proof_of_delivery.trip_id]\n[parameters: [{'%(140207128347344 param)s': 'TR-3159'}]]\n(Background on this error at: https://sqlalche.me/e/21/xd2s)", 'input': <app.models.trip.Trip object at 0x7f8482b10d90>, 'ctx': {'error': "StatementError: (sqlalchemy.exc.MissingGreenlet) greenlet_spawn has not been called; can't call await_() here. Was IO attempted in an unexpected place?\n[SQL: SELECT proof_of_delivery.id, proof_of_delivery.trip_id, proof_of_delivery.otp_code, proof_of_delivery.otp_verified_at, proof_of_delivery.photo_url, proof_of_delivery.signature_svg, proof_of_delivery.recipient_name, proof_of_delivery.recipient_notes, proof_of_delivery.created_at \nFROM proof_of_delivery \nWHERE ? = proof_of_delivery.trip_id]\n[parameters: [{'%(140207128347344 param)s': 'TR-3159'}]]\n(Background on this error at: https://sqlalche.me/e/21/xd2s)"}}
+
+  File "/data/antigravity/smartfleet_backend/app/api/v1/trips.py", line 34, in create_trip
+    POST /api/v1/trips
+INFO:     10.16.1.43:0 - "POST /api/v1/auth/driver-login HTTP/1.1" 401 Unauthorized
+INFO:     10.16.37.163:0 - "GET /api/v1/app/check-update?current_version_code=3&current_version_name=2.2.0 HTTP/1.1" 200 OK
+/usr/local/lib/python3.11/site-packages/aiosqlite/cursor.py:32: RuntimeWarning: coroutine 'Connection.cursor' was never awaited
+  return await self._conn._execute(fn, *args, **kwargs)
+RuntimeWarning: Enable tracemalloc to get the object allocation traceback
+INFO:     10.16.26.69:0 - "POST /api/v1/auth/admin-login HTTP/1.1" 200 OK
+INFO:     10.16.37.163:0 - "GET /api/v1/app/check-update?current_version_code=3&current_version_name=2.2.0 HTTP/1.1" 200 OK
+INFO:     10.16.37.163:0 - "POST /api/v1/trips HTTP/1.1" 500 Internal Server Error
+ERROR:    Exception in ASGI application
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.11/site-packages/uvicorn/protocols/http/httptools_impl.py", line 422, in run_asgi
+    result = await app(  # type: ignore[func-returns-value]
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/uvicorn/middleware/proxy_headers.py", line 63, in __call__
+    return await self.app(scope, receive, send)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/fastapi/applications.py", line 1194, in __call__
+    await super().__call__(scope, receive, send)
+  File "/usr/local/lib/python3.11/site-packages/starlette/applications.py", line 96, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/usr/local/lib/python3.11/site-packages/starlette/middleware/errors.py", line 186, in __call__
+    raise exc
+  File "/usr/local/lib/python3.11/site-packages/starlette/middleware/errors.py", line 164, in __call__
+    await self.app(scope, receive, _send)
+  File "/usr/local/lib/python3.11/site-packages/fastapi/telemetry/_asgi.py", line 151, in __call__
+    await self.app(scope, receive, send)
+  File "/usr/local/lib/python3.11/site-packages/starlette/middleware/cors.py", line 91, in __call__
+    await self.simple_response(scope, receive, send, request_headers=headers)
+  File "/usr/local/lib/python3.11/site-packages/starlette/middleware/cors.py", line 149, in simple_response
+    await self.app(scope, receive, send)
+  File "/usr/local/lib/python3.11/site-packages/starlette/middleware/exceptions.py", line 63, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+  File "/usr/local/lib/python3.11/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/usr/local/lib/python3.11/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "/usr/local/lib/python3.11/site-packages/fastapi/middleware/asyncexitstack.py", line 18, in __call__
+    await self.app(scope, receive, send)
+  File "/usr/local/lib/python3.11/site-packages/starlette/routing.py", line 683, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/usr/local/lib/python3.11/site-packages/fastapi/routing.py", line 2811, in app
+    await route.handle(scope, receive, send)
+  File "/usr/local/lib/python3.11/site-packages/fastapi/routing.py", line 1839, in handle
+    await self.original_router.handle(scope, receive, send)
+  File "/usr/local/lib/python3.11/site-packages/fastapi/routing.py", line 2894, in handle
+    await included_router._handle_selected(scope, receive, send)
+  File "/usr/local/lib/python3.11/site-packages/fastapi/routing.py", line 1850, in _handle_selected
+    await route.handle(scope, receive, send)
+  File "/usr/local/lib/python3.11/site-packages/fastapi/routing.py", line 1839, in handle
+    await self.original_router.handle(scope, receive, send)
+  File "/usr/local/lib/python3.11/site-packages/fastapi/routing.py", line 2894, in handle
+    await included_router._handle_selected(scope, receive, send)
+  File "/usr/local/lib/python3.11/site-packages/fastapi/routing.py", line 1865, in _handle_selected
+    await original_route.handle(scope, receive, send)
+  File "/usr/local/lib/python3.11/site-packages/fastapi/routing.py", line 1328, in handle
+    await effective_context.app(scope, receive, send)
+  File "/usr/local/lib/python3.11/site-packages/fastapi/routing.py", line 166, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+  File "/usr/local/lib/python3.11/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/usr/local/lib/python3.11/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "/usr/local/lib/python3.11/site-packages/fastapi/routing.py", line 152, in app
+    response = await f(request)
+               ^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/fastapi/routing.py", line 767, in app
+    content = await serialize_response(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/fastapi/routing.py", line 343, in serialize_response
+    raise ResponseValidationError(
+fastapi.exceptions.ResponseValidationError: 1 validation error:
+  {'type': 'get_attribute_error', 'loc': ('response', 'pod'), 'msg': "Error extracting attribute: StatementError: (sqlalchemy.exc.MissingGreenlet) greenlet_spawn has not been called; can't call await_() here. Was IO attempted in an unexpected place?\n[SQL: SELECT proof_of_delivery.id, proof_of_delivery.trip_id, proof_of_delivery.otp_code, proof_of_delivery.otp_verified_at, proof_of_delivery.photo_url, proof_of_delivery.signature_svg, proof_of_delivery.recipient_name, proof_of_delivery.recipient_notes, proof_of_delivery.created_at \nFROM proof_of_delivery \nWHERE ? = proof_of_delivery.trip_id]\n[parameters: [{'%(140207128347344 param)s': 'TR-3347'}]]\n(Background on this error at: https://sqlalche.me/e/21/xd2s)", 'input': <app.models.trip.Trip object at 0x7f848438bdd0>, 'ctx': {'error': "StatementError: (sqlalchemy.exc.MissingGreenlet) greenlet_spawn has not been called; can't call await_() here. Was IO attempted in an unexpected place?\n[SQL: SELECT proof_of_delivery.id, proof_of_delivery.trip_id, proof_of_delivery.otp_code, proof_of_delivery.otp_verified_at, proof_of_delivery.photo_url, proof_of_delivery.signature_svg, proof_of_delivery.recipient_name, proof_of_delivery.recipient_notes, proof_of_delivery.created_at \nFROM proof_of_delivery \nWHERE ? = proof_of_delivery.trip_id]\n[parameters: [{'%(140207128347344 param)s': 'TR-3347'}]]\n(Background on this error at: https://sqlalche.me/e/21/xd2s)"}}
+
+  File "/data/antigravity/smartfleet_backend/app/api/v1/trips.py", line 34, in create_trip
+    POST /api/v1/trips
+INFO:     10.16.2.20:0 - "POST /api/v1/auth/driver-login HTTP/1.1" 401 Unauthorized
+INFO:     10.16.39.107:0 - "GET /api/v1/app/check-update?current_version_code=3&current_version_name=2.2.0 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57024 - "GET /api/v1/trips HTTP/1.1" 200 OK
+WARNING:  WatchFiles detected changes in 'app/models/trip.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [11843]
+INFO:     Started server process [12948]
+INFO:     Waiting for application startup.
+🚀 Initializing database schema...
+ℹ️ Database already contains data. Skipping initial seeding.
+INFO:     Application startup complete.
+WARNING:  WatchFiles detected changes in 'app/api/v1/trips.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [12948]
+INFO:     Started server process [12954]
+INFO:     Waiting for application startup.
+🚀 Initializing database schema...
+ℹ️ Database already contains data. Skipping initial seeding.
+INFO:     Application startup complete.
+WARNING:  WatchFiles detected changes in 'app/api/v1/auth.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [12954]
+INFO:     Started server process [12966]
+INFO:     Waiting for application startup.
+🚀 Initializing database schema...
+ℹ️ Database already contains data. Skipping initial seeding.
+INFO:     Application startup complete.
+INFO:     127.0.0.1:58928 - "POST /api/v1/auth/driver-login HTTP/1.1" 500 Internal Server Error
+ERROR:    Exception in ASGI application
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.11/site-packages/uvicorn/protocols/http/httptools_impl.py", line 422, in run_asgi
+    result = await app(  # type: ignore[func-returns-value]
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/uvicorn/middleware/proxy_headers.py", line 63, in __call__
+    return await self.app(scope, receive, send)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/fastapi/applications.py", line 1194, in __call__
+    await super().__call__(scope, receive, send)
+  File "/usr/local/lib/python3.11/site-packages/starlette/applications.py", line 96, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/usr/local/lib/python3.11/site-packages/starlette/middleware/errors.py", line 186, in __call__
+    raise exc
+  File "/usr/local/lib/python3.11/site-packages/starlette/middleware/errors.py", line 164, in __call__
+    await self.app(scope, receive, _send)
+  File "/usr/local/lib/python3.11/site-packages/fastapi/telemetry/_asgi.py", line 151, in __call__
+    await self.app(scope, receive, send)
+  File "/usr/local/lib/python3.11/site-packages/starlette/middleware/cors.py", line 91, in __call__
+    await self.simple_response(scope, receive, send, request_headers=headers)
+  File "/usr/local/lib/python3.11/site-packages/starlette/middleware/cors.py", line 149, in simple_response
+    await self.app(scope, receive, send)
+  File "/usr/local/lib/python3.11/site-packages/starlette/middleware/exceptions.py", line 63, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+  File "/usr/local/lib/python3.11/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/usr/local/lib/python3.11/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "/usr/local/lib/python3.11/site-packages/fastapi/middleware/asyncexitstack.py", line 18, in __call__
+    await self.app(scope, receive, send)
+  File "/usr/local/lib/python3.11/site-packages/starlette/routing.py", line 683, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/usr/local/lib/python3.11/site-packages/fastapi/routing.py", line 2811, in app
+    await route.handle(scope, receive, send)
+  File "/usr/local/lib/python3.11/site-packages/fastapi/routing.py", line 1839, in handle
+    await self.original_router.handle(scope, receive, send)
+  File "/usr/local/lib/python3.11/site-packages/fastapi/routing.py", line 2894, in handle
+    await included_router._handle_selected(scope, receive, send)
+  File "/usr/local/lib/python3.11/site-packages/fastapi/routing.py", line 1850, in _handle_selected
+    await route.handle(scope, receive, send)
+  File "/usr/local/lib/python3.11/site-packages/fastapi/routing.py", line 1839, in handle
+    await self.original_router.handle(scope, receive, send)
+  File "/usr/local/lib/python3.11/site-packages/fastapi/routing.py", line 2894, in handle
+    await included_router._handle_selected(scope, receive, send)
+  File "/usr/local/lib/python3.11/site-packages/fastapi/routing.py", line 1865, in _handle_selected
+    await original_route.handle(scope, receive, send)
+  File "/usr/local/lib/python3.11/site-packages/fastapi/routing.py", line 1328, in handle
+    await effective_context.app(scope, receive, send)
+  File "/usr/local/lib/python3.11/site-packages/fastapi/routing.py", line 166, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+  File "/usr/local/lib/python3.11/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/usr/local/lib/python3.11/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "/usr/local/lib/python3.11/site-packages/fastapi/routing.py", line 152, in app
+    response = await f(request)
+               ^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/fastapi/routing.py", line 745, in app
+    raw_response = await run_endpoint_function(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/fastapi/routing.py", line 372, in run_endpoint_function
+    return await dependant.call(**values)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/antigravity/smartfleet_backend/app/api/v1/auth.py", line 161, in driver_login
+    digits = re.sub(r'[^0-9]', '', clean_phone)
+             ^^
+NameError: name 're' is not defined
+WARNING:  WatchFiles detected changes in 'app/api/v1/auth.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [12966]
+INFO:     Started server process [12994]
+INFO:     Waiting for application startup.
+🚀 Initializing database schema...
+ℹ️ Database already contains data. Skipping initial seeding.
+INFO:     Application startup complete.
+INFO:     127.0.0.1:60136 - "POST /api/v1/auth/driver-login HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60146 - "POST /api/v1/auth/driver-login HTTP/1.1" 401 Unauthorized
+WARNING:  WatchFiles detected changes in 'app/api/v1/auth.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [12994]
+INFO:     Started server process [13003]
+INFO:     Waiting for application startup.
+🚀 Initializing database schema...
+ℹ️ Database already contains data. Skipping initial seeding.
+INFO:     Application startup complete.
+INFO:     127.0.0.1:57098 - "POST /api/v1/auth/driver-login HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57108 - "POST /api/v1/trips HTTP/1.1" 200 OK
+INFO:     127.0.0.1:39260 - "POST /api/v1/trips/TR-2799/accept HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51154 - "POST /api/v1/trips/TR-2799/start HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59402 - "POST /api/v1/trips/TR-2799/breakdown HTTP/1.1" 200 OK
