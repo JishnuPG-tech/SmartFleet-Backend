@@ -1,9 +1,17 @@
 from datetime import datetime
-from typing import Optional
-from pydantic import BaseModel, Field, ConfigDict
+from typing import Optional, Any
+from pydantic import BaseModel, Field, ConfigDict, model_validator
 
 class VerifyOtpRequest(BaseModel):
     otp: str = Field(..., min_length=4, max_length=6, description="4-digit handover OTP")
+
+    @model_validator(mode="before")
+    @classmethod
+    def normalize_otp_field(cls, data: Any) -> Any:
+        if isinstance(data, dict):
+            if "otp" not in data and "otp_code" in data:
+                data["otp"] = data["otp_code"]
+        return data
 
 class CompletePodRequest(BaseModel):
     recipient_name: Optional[str] = None

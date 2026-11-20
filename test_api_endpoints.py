@@ -61,21 +61,30 @@ with httpx.Client(base_url=base_url, timeout=10.0) as client:
     print("8. /api/v1/telemetry/ping ->", r.status_code, r.json())
     assert r.status_code == 200
 
-    # 9. POD OTP Verification
+    # 9. POD OTP Verification (both otp and otp_code)
     r = client.post("/api/v1/pod/TR-1025/verify-otp", json={"otp": "5824"})
-    print("9. /api/v1/pod/TR-1025/verify-otp ->", r.status_code, r.json())
+    print("9a. /api/v1/pod/TR-1025/verify-otp (otp) ->", r.status_code, r.json())
     assert r.status_code == 200
 
-    # 10. Earnings Summary
+    r = client.post("/api/v1/pod/TR-1025/verify-otp", json={"otp_code": "5824"})
+    print("9b. /api/v1/pod/TR-1025/verify-otp (otp_code) ->", r.status_code, r.json())
+    assert r.status_code == 200
+
+    # 10. OTA App CMS Config
+    r = client.get("/api/v1/config/app")
+    print("10. /api/v1/config/app ->", r.status_code, "Version:", r.json()["version"])
+    assert r.status_code == 200 and "emergency_contacts" in r.json()
+
+    # 11. Earnings Summary
     r = client.get("/api/v1/earnings/driver/summary", headers=headers)
-    print("10. /api/v1/earnings/driver/summary ->", r.status_code, r.json()["driver_name"], "Pending:", r.json()["pending_payout_amount"])
+    print("11. /api/v1/earnings/driver/summary ->", r.status_code, r.json()["driver_name"], "Pending:", r.json()["pending_payout_amount"])
     assert r.status_code == 200
 
-    # 11. Alerts
+    # 12. Alerts
     r = client.get("/api/v1/alerts")
     alerts = r.json()
     titles = [x.get("title") for x in alerts]
-    print(f"11. /api/v1/alerts -> {r.status_code}, Found {len(alerts)} alerts: {titles}")
+    print(f"12. /api/v1/alerts -> {r.status_code}, Found {len(alerts)} alerts: {titles}")
     assert r.status_code == 200
 
 print("\nALL FASTAPI ENDPOINT CHECKS PASSED WITH 100% SUCCESS!")

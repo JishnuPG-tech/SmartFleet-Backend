@@ -107,7 +107,7 @@ async def get_driver_active_trip(
     )
     res = await db.execute(query)
     trip = res.scalars().first()
-    return trip_loaded
+    return trip
 
 @router.get("/{id}", response_model=TripOut)
 async def get_trip(id: str, db: AsyncSession = Depends(get_db)):
@@ -115,7 +115,7 @@ async def get_trip(id: str, db: AsyncSession = Depends(get_db)):
     trip = result.scalars().first()
     if not trip:
         raise HTTPException(status_code=404, detail=f"Trip '{id}' not found")
-    return trip_loaded
+    return trip
 
 @router.post("/{id}/accept", response_model=TripOut)
 async def accept_trip(id: str, db: AsyncSession = Depends(get_db)):

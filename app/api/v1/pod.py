@@ -41,13 +41,18 @@ async def verify_delivery_otp(
 @router.post("/{trip_id}/complete", response_model=PodOut)
 async def complete_proof_of_delivery(
     trip_id: str,
-    otp: str = Form(..., description="4-digit handover OTP"),
+    otp: Optional[str] = Form(None, description="4-digit handover OTP"),
+    otp_code: Optional[str] = Form(None, description="Alternative field for 4-digit handover OTP"),
     signature_svg: str = Form(..., description="SVG path or vector string of recipient signature"),
     recipient_name: Optional[str] = Form(None),
     recipient_notes: Optional[str] = Form(None),
     photo: UploadFile = File(..., description="Cargo handover photo (JPEG, PNG, WebP)"),
     db: AsyncSession = Depends(get_db)
 ):
+    clean_otp = (otp or otp_code or "").strip()
+    if not clean_otp:
+        raise HTTPException(status_code=400, detail="Missing delivery OTP code")
+
     result = await db.execute(select(Trip).filter(Trip.id == trip_id.strip()))
     trip = result.scalars().first()
     if not trip:
@@ -57,7 +62,7 @@ async def complete_proof_of_delivery(
         raise HTTPException(status_code=400, detail=f"Trip '{trip_id}' has already been marked as delivered")
 
     # Check OTP
-    if not verify_pod_otp("5824", otp) and not verify_pod_otp("1234", otp):
+    if not verify_pod_otp("5824", clean_otp) and not verify_pod_otp("1234", clean_otp):
         raise HTTPException(status_code=400, detail="Invalid delivery OTP")
 
     # Save media assets atomically
@@ -67,7 +72,7 @@ async def complete_proof_of_delivery(
     now = datetime.now(timezone.utc)
     pod = ProofOfDelivery(
         trip_id=trip.id,
-        otp_code=otp.strip(),
+        otp_code=clean_otp,
         otp_verified_at=now,
         photo_url=photo_url,
         signature_svg=saved_sig,
